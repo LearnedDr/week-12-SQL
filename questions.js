@@ -1,5 +1,19 @@
 const fs = require('fs/promises');
 const inquirer = require('inquirer');
+const mySQL = require('mysql2');
+
+
+const db = mySQL.createConnection(
+    {
+      host: '127.0.0.1',
+      // MySQL username,
+      user: 'root',
+      // MySQL password
+      password: 'Frede33#',
+      database: 'business_manager_db'
+    },
+    console.log(`Connected to the courses_db database.`)
+  );
 
 const questions = [
     {
@@ -54,17 +68,62 @@ const questions = [
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
 ]
 
-// switch(questions.initial) {
-//     case 'View All Departments' : function()
-// };
 
 function init() {
     inquirer
         .prompt(questions)
         .then(response => {
-            console.log("response", response)
+            switch(response.initial) {
+                case 'View All Departments' :
+                    const deptQuery = () => {                    
+                        db.promise().query(`SELECT * FROM departments;`)
+                            .then(([results]) => {
+                                return console.table(results);
+                            })
+                    //         .catch((err) => console.log(err))
+                    //         .then( () => db.end());
+                    };
+                    deptQuery();
+                    break;
+                case 'View All Roles' :
+                    const roleQuery = () => {
+                        db.promise().query('SELECT * FROM roles;')
+                            .then(([results]) => {
+                                return console.table(results);
+                            })
+                    };
+                    roleQuery();
+                    break;
+                case 'View All Employees' :
+                    const employeeQuery = () => {
+                        db.promise().query('SELECT * FROM employees;')
+                            .then(([results]) => {
+                                return console.table(results);
+                            })
+                    };
+                    employeeQuery();
+                    break;   
+            };
         });
-}
+            // console.log("response", response)
+        };
+
 
 // Function call to initialize app
 init();
+
+// const deptChoices = 
+// db.promise().query('SELECT * FROM departments;')
+//     // .then (([results]) => {
+//     // console.log(results);
+//     // return results})
+//     .then (([results]) => {
+//         console.table(results);
+//         return results
+//     })
+
+// console.log(typeof deptChoices);
+// console.log(deptChoices)
+
+
+
