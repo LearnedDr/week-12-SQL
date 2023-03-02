@@ -119,7 +119,20 @@ function init() {
 };
 
 const addDepartment = () => {
-
+    inquirer.prompt([
+        {
+            type:"input",
+            name:"deptName",
+            message:"What would you like your new department to be called?"
+        }
+    ]).then(response => {
+        return db.promise().query(`INSERT INTO departments (name) VALUES ("${response.deptName}");`)
+    }).then(response => {
+        console.log("Department Added")
+        init()
+    }).catch(err => {
+        console.log("Err", err)
+    })
 }
 
 const addEmployee = () => {
@@ -178,6 +191,38 @@ const addEmployee = () => {
     }
 
     const addRole = () => {
+        let deptList = [];
+            db.promise().query('SELECT * FROM departments')
+            .then(([results]) => {
+                deptList=  results.map(Element => ({ value: Element.id, name: Element.title }))
+                return deptList
+            }).then(results => {
+                inquirer.prompt([
+                    {
+                        type:"input",
+                        name:"title",
+                        message:"What is the title of your new role?",
+                    },
+                    {
+                        type:"input",
+                        name:"salary",
+                        message:"What is the salary of this new role? (in K/year)",
+                    },
+                    {
+                        type:"list",
+                        name:"department",
+                        message:"What department does this role belong to?",
+                        choices: deptList
+                    }
+                ]).then(response => {
+                    return db.promise().query(`INSERT INTO roles (title, salary, department_id) VALUES ("${response.title})", "${response.salary}", "${response.department}");`)
+                }).then(response => {
+                    console.log("New Role Added")
+                    init()
+                }).catch(err => {
+                    console.log("Err", err)
+                })
+            })
 
     }
     // Function call to initialize app
